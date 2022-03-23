@@ -40,7 +40,7 @@ pomdp = SimplePOMDP(0.7)
 
 s = 5
 b = SparseCat([s], [1.0])
-solver = POMCPOWSolver()
+solver = POMCPOWRAVESolver()
 
 planner = solve(solver, pomdp)
 a, info = action_info(planner, b)

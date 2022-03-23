@@ -1,4 +1,4 @@
-module POMCPOW
+module POMCPOWRAVE
 
 using POMDPs
 using BasicPOMCP
@@ -21,7 +21,7 @@ import POMDPModelTools: action_info
 import MCTS: n_children, next_action, isroot, node_tag, tooltip_tag
 
 export
-    POMCPOWSolver,
+    POMCPOWRAVESolver,
     POMCPOWPlanner,
     POMCPOWTree,
     POWNodeBelief,
@@ -54,7 +54,7 @@ include("tree.jl")
 include("criteria.jl")
 
 """
-    POMCPOWSolver
+    POMCPOWRAVESolver
 
 Partially observable Monte Carlo planning with observation widening.
 
@@ -132,7 +132,7 @@ Fields:
     if this method is not implemented, `a` will be returned directly.
 
 """
-@with_kw mutable struct POMCPOWSolver{RNG<:AbstractRNG} <: AbstractPOMCPSolver
+@with_kw mutable struct POMCPOWRAVESolver{RNG<:AbstractRNG} <: AbstractPOMCPSolver
     eps::Float64                = 0.01
     max_depth::Int              = typemax(Int)
     criterion                   = MaxUCB(1.0)
@@ -165,7 +165,7 @@ function push_weighted!(::ParticleCollection, sp) end
 include("planner2.jl")
 include("solver2.jl")
 
-function solve(solver::POMCPOWSolver, problem::POMDP)
+function solve(solver::POMCPOWRAVESolver, problem::POMDP)
     return POMCPOWPlanner(solver, problem)
 end
 

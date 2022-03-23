@@ -13,19 +13,19 @@ using POMDPPolicies
 @testset "all" begin
 
     @testset "POMDPTesting" begin
-        solver = POMCPOWSolver()
+        solver = POMCPOWRAVESolver()
         pomdp = BabyPOMDP()
         test_solver(solver, pomdp, updater=DiscreteUpdater(pomdp))
         test_solver(solver, pomdp)
 
-        solver = POMCPOWSolver(max_time=0.1, tree_queries=typemax(Int))
+        solver = POMCPOWRAVESolver(max_time=0.1, tree_queries=typemax(Int))
         test_solver(solver, pomdp, updater=DiscreteUpdater(pomdp))
     end
 
     @testset "type stability" begin
         # make sure internal function is type stable
         pomdp = BabyPOMDP()
-        solver = POMCPOWSolver()
+        solver = POMCPOWRAVESolver()
         planner = solve(solver, pomdp)
         b = initialstate_distribution(pomdp)
         B = POMCPOW.belief_type(POMCPOW.POWNodeFilter, typeof(pomdp))
@@ -33,7 +33,7 @@ using POMDPPolicies
         @inferred POMCPOW.simulate(planner, POMCPOW.POWTreeObsNode(tree, 1), true, 10)
 
         pomdp = LightDark1D()
-        solver = POMCPOWSolver(default_action=485)
+        solver = POMCPOWRAVESolver(default_action=485)
         planner = solve(solver, pomdp)
 
         b = ParticleCollection([LightDark1DState(-1, 0)])
@@ -45,7 +45,7 @@ using POMDPPolicies
 
     @testset "currentobs and history" begin
         pomdp = BabyPOMDP()
-        solver = POMCPOWSolver()
+        solver = POMCPOWRAVESolver()
         planner = solve(solver, pomdp)
         b = initialstate_distribution(pomdp)
         B = POMCPOW.belief_type(POMCPOW.POWNodeFilter, typeof(pomdp))
@@ -68,7 +68,7 @@ using POMDPPolicies
     @testset "D3tree" begin
         # make sure internal function is type stable
         pomdp = BabyPOMDP()
-        solver = POMCPOWSolver()
+        solver = POMCPOWRAVESolver()
         planner = solve(solver, pomdp)
         b = initialstate_distribution(pomdp)
         a, info = action_info(planner, b)
@@ -83,7 +83,7 @@ using POMDPPolicies
 
     @testset "actionvalues" begin
         pomdp = BabyPOMDP()
-        solver = POMCPOWSolver()
+        solver = POMCPOWRAVESolver()
         planner = solve(solver, pomdp)
         b = initialstate_distribution(pomdp)
         @test actionvalues(planner, b) isa AbstractVector
