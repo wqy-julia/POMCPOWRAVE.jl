@@ -3,14 +3,8 @@ function simulate(pomcp::POMCPOWPlanner, h_node::POWTreeObsNode{B,A,O}, s::S, d)
     h = h_node.node
     sol = pomcp.solver
     dep = 1.0
-    # if POMDPs.isterminal(pomcp.problem, s)
-    #     return 0.0, dep
-    # end
-    # if d <= 0
-    #     return 0.0, dep
-    # end
     if POMDPs.isterminal(pomcp.problem, s) || d <= 0
-        return 0.0, dep
+        return 0.0, dep, []
     end
 
     if sol.enable_action_pw
@@ -38,10 +32,11 @@ function simulate(pomcp::POMCPOWPlanner, h_node::POWTreeObsNode{B,A,O}, s::S, d)
             end
             anode = length(tree.n)
             for a in action_space_iter
+                # update_lookup false to true
                 push_anode!(tree, h, a,
                             init_N(pomcp.init_N, pomcp.problem, POWTreeObsNode(tree, h), a),
                             init_V(pomcp.init_V, pomcp.problem, POWTreeObsNode(tree, h), a),
-                            false)
+                            true)
             end
         end
     end
@@ -85,14 +80,15 @@ function simulate(pomcp::POMCPOWPlanner, h_node::POWTreeObsNode{B,A,O}, s::S, d)
 
     if new_node
         dep = dep + 1.0
-        R = r + POMDPs.discount(pomcp.problem)*estimate_value(pomcp.solved_estimate, pomcp.problem, sp, POWTreeObsNode(tree, hao), d-1)
+        est_value, action_list = estimate_value(pomcp.solved_estimate, pomcp.problem, sp, POWTreeObsNode(tree, hao), d-1)
+        R = r + POMDPs.discount(pomcp.problem) * est_value
     else
         pair = rand(sol.rng, tree.generated[best_node])
         o = pair.first
         hao = pair.second
         push_weighted!(tree.sr_beliefs[hao], pomcp.node_sr_belief_updater, s, sp, r)
         sp, r = rand(sol.rng, tree.sr_beliefs[hao])
-        reward, depth = simulate(pomcp, POWTreeObsNode(tree, hao), sp, d-1)
+        reward, depth, action_list = simulate(pomcp, POWTreeObsNode(tree, hao), sp, d-1)
         dep = depth + 1
         # dep = max(depth + 1, dep)
         R = r + POMDPs.discount(pomcp.problem) * reward
@@ -105,6 +101,18 @@ function simulate(pomcp::POMCPOWPlanner, h_node::POWTreeObsNode{B,A,O}, s::S, d)
         tree.v[best_node] += (R-tree.v[best_node])/tree.n[best_node]
     end
 
-    return R, dep
+    current_action_list = []
+    push!(current_action_list, a)
+    for act in eachindex(action_list)
+        push!(current_action_list, action_list[act])
+        if haskey(tree.o_child_lookup, (h,action_list[act]))
+            anode = tree.o_child_lookup[(h,action_list[act])]
+            tree.n_hat[anode] += 1
+            if tree.v_hat[anode] != -Inf
+                tree.v_hat[anode] += (R-tree.v_hat[anode])/tree.n_hat[anode]
+            end
+        end
+    end
+    return R, dep, current_action_list
 end
 

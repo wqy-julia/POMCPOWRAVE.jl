@@ -15,7 +15,7 @@ using POMDPPolicies
 using BasicPOMCP: convert_estimator
 
 import Base: insert!
-import POMDPs: action, solve, mean, rand, updater, currentobs, history
+import POMDPs: action, solve, mean, rand, updater, currentobs, history, simulate, discount
 import POMDPModelTools: action_info
 
 import MCTS: n_children, next_action, isroot, node_tag, tooltip_tag
@@ -171,5 +171,6 @@ end
 
 include("updater.jl")
 include("visualization.jl")
+include("rollout.jl")
 
 end # module

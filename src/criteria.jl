@@ -13,11 +13,11 @@ function select_best(crit::MaxUCB, h_node::POWTreeObsNode, rng)
     for node in tree.tried[h]
         n = tree.n[node]
         if n == 0 && ltn <= 0.0
-            criterion_value = tree.v[node]
-        elseif n == 0 && tree.v[node] == -Inf
+            criterion_value = 0.5 * (tree.v[node] + tree.v_hat[node])
+        elseif n == 0 && 0.5 * (tree.v[node] + tree.v_hat[node]) == -Inf
             criterion_value = Inf
         else
-            criterion_value = tree.v[node] + crit.c*sqrt(ltn/n)
+            criterion_value = 0.5 * (tree.v[node] + tree.v_hat[node]) + crit.c*sqrt(ltn/n)
         end
         if criterion_value > best_criterion_val
             best_criterion_val = criterion_value
@@ -48,8 +48,8 @@ function select_best(crit::MaxQ, h_node::POWTreeObsNode, rng)
     best_v = tree.v[best_node]
     @assert !isnan(best_v)
     for node in tree.tried[h][2:end]
-        if tree.v[node] >= best_v
-            best_v = tree.v[node]
+        if 0.5 * (tree.v[node] + tree.v_hat[node]) >= best_v
+            best_v = 0.5 * (tree.v[node] + tree.v_hat[node])
             best_node = node
         end
     end

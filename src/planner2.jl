@@ -77,7 +77,7 @@ function search(pomcp::POMCPOWPlanner, tree::POMCPOWTree, info::Dict{Symbol,Any}
         s = rand(pomcp.solver.rng, tree.root_belief)
         if !POMDPs.isterminal(pomcp.problem, s)
             max_depth = min(pomcp.solver.max_depth, ceil(Int, log(pomcp.solver.eps)/log(discount(pomcp.problem))))
-            reward, depth = simulate(pomcp, POWTreeObsNode(tree, 1), s, max_depth)
+            reward, depth, action_list = simulate(pomcp, POWTreeObsNode(tree, 1), s, max_depth)
             info[:tree_depth] = (info[:tree_depth] * dep_count + depth) / (dep_count + 1)
             dep_count+=1
             # info[:tree_depth] = max(info[:tree_depth], depth)
