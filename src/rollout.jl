@@ -1,11 +1,11 @@
-function estimate_value(estimator::Union{BasicPOMCP.SolvedPORollout,BasicPOMCP.SolvedFORollout}, pomdp::POMDPs.POMDP, start_state, h::BeliefNode, steps::Int)
-    rollout(estimator, pomdp, start_state, h, steps)
+function estimate_value_action(estimator::Union{BasicPOMCP.SolvedPORollout,BasicPOMCP.SolvedFORollout}, pomdp::POMDPs.POMDP, start_state, h::BeliefNode, steps::Int)
+    rollout_action(estimator, pomdp, start_state, h, steps)
 end
 
-function rollout(est::BasicPOMCP.SolvedPORollout, pomdp::POMDPs.POMDP, start_state, h::BeliefNode, steps::Int)
+function rollout_action(est::BasicPOMCP.SolvedPORollout, pomdp::POMDPs.POMDP, start_state, h::BeliefNode, steps::Int)
     b = extract_belief(est.updater, h)
     sim = BasicPOMCP.RolloutSimulator(est.rng, steps)
-    return POMDPs.simulate(sim, pomdp, est.policy, est.updater, b, start_state)
+    return simulate_action(sim, pomdp, est.policy, est.updater, b, start_state)
 end
 
 function extract_belief end
@@ -13,7 +13,7 @@ function extract_belief end
 # some defaults are provided
 extract_belief(::BasicPOMCP.NothingUpdater, node::BeliefNode) = nothing
 
-function simulate(sim::BasicPOMCP.RolloutSimulator, pomdp::POMDP, policy::Policy, updater::Updater, initial_belief, s)
+function simulate_action(sim::BasicPOMCP.RolloutSimulator, pomdp::POMDP, policy::Policy, updater::Updater, initial_belief, s)
     if sim.eps == nothing
         eps = 0.0
     else

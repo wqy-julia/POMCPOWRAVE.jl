@@ -80,7 +80,7 @@ function simulate(pomcp::POMCPOWPlanner, h_node::POWTreeObsNode{B,A,O}, s::S, d)
 
     if new_node
         dep = dep + 1.0
-        est_value, action_list = estimate_value(pomcp.solved_estimate, pomcp.problem, sp, POWTreeObsNode(tree, hao), d-1)
+        est_value, action_list = estimate_value_action(pomcp.solved_estimate, pomcp.problem, sp, POWTreeObsNode(tree, hao), d-1)
         R = r + POMDPs.discount(pomcp.problem) * est_value
     else
         pair = rand(sol.rng, tree.generated[best_node])
