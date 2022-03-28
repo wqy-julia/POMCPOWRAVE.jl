@@ -1,4 +1,4 @@
-using POMCPOW
+using POMCPOWRAVE
 using Base.Test
 
 t = CategoricalVector(1, 1.0)

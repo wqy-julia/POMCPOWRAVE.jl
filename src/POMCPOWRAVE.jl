@@ -22,10 +22,10 @@ import MCTS: n_children, next_action, isroot, node_tag, tooltip_tag
 
 export
     POMCPOWRAVESolver,
-    POMCPOWPlanner,
-    POMCPOWTree,
-    POWNodeBelief,
-    POWTreeObsNode,
+    POMCPOWRAVEPlanner,
+    POMCPOWRAVETree,
+    POWRAVENodeBelief,
+    POWRAVETreeObsNode,
     CategoricalVector,
     FORollout,
     FOValue,
@@ -42,7 +42,7 @@ export
     sr_belief,
     isroot,
 
-    POMCPOWVisualizer,
+    POMCPOWRAVEVisualizer,
     blink
 
 const init_V = init_Q
@@ -83,7 +83,7 @@ Fields:
     default: Base.GLOBAL_RNG
 - `node_sr_belief_updater::Updater`:
     Updater for state-reward distribution at the nodes.
-    default: `POWNodeFilter()`
+    default: `POWRAVENodeFilter()`
 - `estimate_value::Any`: (rollout policy can be specified by setting this to RolloutEstimator(policy))
     Function, object, or number used to estimate the value at the leaf nodes.
     If this is a function `f`, `f(pomdp, s, h::BeliefNode, steps)` will be called to estimate the value.
@@ -140,7 +140,7 @@ Fields:
     tree_queries::Int           = 1000
     max_time::Float64           = Inf
     rng::RNG                    = Random.GLOBAL_RNG
-    node_sr_belief_updater      = POWNodeFilter()
+    node_sr_belief_updater      = POWRAVENodeFilter()
 
     estimate_value::Any         = RolloutEstimator(RandomSolver(rng))
 
@@ -166,7 +166,7 @@ include("planner2.jl")
 include("solver2.jl")
 
 function solve(solver::POMCPOWRAVESolver, problem::POMDP)
-    return POMCPOWPlanner(solver, problem)
+    return POMCPOWRAVEPlanner(solver, problem)
 end
 
 include("updater.jl")

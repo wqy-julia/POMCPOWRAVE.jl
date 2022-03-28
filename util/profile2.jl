@@ -1,14 +1,14 @@
 using POMDPs
-using POMCPOW
+using POMCPOWRAVE
 using ProfileView
 using POMDPModels
 
 #=
 using Gallium
-breakpoint(Pkg.dir("POMCPOW", "src", "solver2.jl"), 100)
+breakpoint(Pkg.dir("POMCPOWRAVE", "src", "solver2.jl"), 100)
 =#
 
-solver = POMCPOWSolver(tree_queries=250_000,
+solver = POMCPOWRAVESolver(tree_queries=250_000,
                      eps=0.01,
                      criterion=MaxUCB(10.0),
                      enable_action_pw=true,
@@ -17,7 +17,7 @@ solver = POMCPOWSolver(tree_queries=250_000,
                      rng=MersenneTwister(2))
 
 problem = LightDark1D()
-policy = POMCPOWPlanner(solver, problem)
+policy = POMCPOWRAVEPlanner(solver, problem)
 ib = initial_state_distribution(problem)
 
 a = action(policy, ib)
@@ -33,13 +33,13 @@ P = typeof(problem)
 S = state_type(P)
 A = action_type(P)
 O = obs_type(P)
-tree = POMCPOWTree{POWNodeBelief{S,A,O,P},A,O,typeof(ib)}(ib, 500_000)
+tree = POMCPOWRAVETree{POWRAVENodeBelief{S,A,O,P},A,O,typeof(ib)}(ib, 500_000)
 
-@code_warntype POMCPOW.simulate(policy, POMCPOW.POWTreeObsNode(tree, 1), rand(Base.GLOBAL_RNG, ib), 10)
+@code_warntype POMCPOWRAVE.simulate(policy, POMCPOWRAVE.POWRAVETreeObsNode(tree, 1), rand(Base.GLOBAL_RNG, ib), 10)
 =#
 
 #=
-solver = POMCPOWSolver(tree_queries=30,
+solver = POMCPOWRAVESolver(tree_queries=30,
                      eps=0.01,
                      criterion=MaxUCB(10.0),
                      enable_action_pw=true,
@@ -47,7 +47,7 @@ solver = POMCPOWSolver(tree_queries=30,
                      alpha_observation=1/8,
                      rng=MersenneTwister(2))
 
-policy = POMCPOWPlanner(solver, problem)
+policy = POMCPOWRAVEPlanner(solver, problem)
 a = action(policy, ib)
 blink(policy)
 =#

@@ -1,6 +1,6 @@
 # this generated the error
 #
-# ERROR: LoadError: MethodError: no method matching init_node_sr_belief(::POMCPOW.POWNodeFilter, ::SimplePOMDP, ::Int64, ::Int64, ::Int64, ::Float64, ::Int64)
+# ERROR: LoadError: MethodError: no method matching init_node_sr_belief(::POMCPOWRAVE.POWRAVENodeFilter, ::SimplePOMDP, ::Int64, ::Int64, ::Int64, ::Float64, ::Int64)
 
 struct SimplePOMDP <: POMDP{Int,Int,Float64}
     p_success::Float64

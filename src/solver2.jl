@@ -1,4 +1,4 @@
-function simulate(pomcp::POMCPOWPlanner, h_node::POWTreeObsNode{B,A,O}, s::S, d) where {B,S,A,O}
+function simulate(pomcp::POMCPOWRAVEPlanner, h_node::POWRAVETreeObsNode{B,A,O}, s::S, d) where {B,S,A,O}
     tree = h_node.tree
     h = h_node.node
     sol = pomcp.solver
@@ -12,14 +12,14 @@ function simulate(pomcp::POMCPOWPlanner, h_node::POWTreeObsNode{B,A,O}, s::S, d)
         if length(tree.tried[h]) <= sol.k_action * total_n ^ sol.alpha_action
         # if length(tree.tried[h]) < 1
             if h == 1
-                a = next_action(pomcp.next_action, pomcp.problem, tree.root_belief, POWTreeObsNode(tree, h))
+                a = next_action(pomcp.next_action, pomcp.problem, tree.root_belief, POWRAVETreeObsNode(tree, h))
             else
-                a = next_action(pomcp.next_action, pomcp.problem, StateBelief(tree.sr_beliefs[h]), POWTreeObsNode(tree, h))
+                a = next_action(pomcp.next_action, pomcp.problem, StateBelief(tree.sr_beliefs[h]), POWRAVETreeObsNode(tree, h))
             end
             if !sol.check_repeat_act || !haskey(tree.o_child_lookup, (h,a))
                 push_anode!(tree, h, a,
-                            init_N(pomcp.init_N, pomcp.problem, POWTreeObsNode(tree, h), a),
-                            init_V(pomcp.init_V, pomcp.problem, POWTreeObsNode(tree, h), a),
+                            init_N(pomcp.init_N, pomcp.problem, POWRAVETreeObsNode(tree, h), a),
+                            init_V(pomcp.init_V, pomcp.problem, POWRAVETreeObsNode(tree, h), a),
                             sol.check_repeat_act)
             end
         end
@@ -34,8 +34,8 @@ function simulate(pomcp::POMCPOWPlanner, h_node::POWTreeObsNode{B,A,O}, s::S, d)
             for a in action_space_iter
                 # update_lookup false to true
                 push_anode!(tree, h, a,
-                            init_N(pomcp.init_N, pomcp.problem, POWTreeObsNode(tree, h), a),
-                            init_V(pomcp.init_V, pomcp.problem, POWTreeObsNode(tree, h), a),
+                            init_N(pomcp.init_N, pomcp.problem, POWRAVETreeObsNode(tree, h), a),
+                            init_V(pomcp.init_V, pomcp.problem, POWRAVETreeObsNode(tree, h), a),
                             true)
             end
         end
@@ -75,12 +75,12 @@ function simulate(pomcp::POMCPOWPlanner, h_node::POWTreeObsNode{B,A,O}, s::S, d)
     end
 
     if r == Inf
-        @warn("POMCPOW: +Inf reward. This is not recommended and may cause future errors.")
+        @warn("POMCPOWRAVE: +Inf reward. This is not recommended and may cause future errors.")
     end
 
     if new_node
         dep = dep + 1.0
-        est_value, action_list = estimate_value_action(pomcp.solved_estimate, pomcp.problem, sp, POWTreeObsNode(tree, hao), d-1)
+        est_value, action_list = estimate_value_action(pomcp.solved_estimate, pomcp.problem, sp, POWRAVETreeObsNode(tree, hao), d-1)
         R = r + POMDPs.discount(pomcp.problem) * est_value
     else
         pair = rand(sol.rng, tree.generated[best_node])
@@ -88,11 +88,11 @@ function simulate(pomcp::POMCPOWPlanner, h_node::POWTreeObsNode{B,A,O}, s::S, d)
         hao = pair.second
         push_weighted!(tree.sr_beliefs[hao], pomcp.node_sr_belief_updater, s, sp, r)
         sp, r = rand(sol.rng, tree.sr_beliefs[hao])
-        reward, depth, action_list = simulate(pomcp, POWTreeObsNode(tree, hao), sp, d-1)
+        reward, depth, action_list = simulate(pomcp, POWRAVETreeObsNode(tree, hao), sp, d-1)
         dep = depth + 1
         # dep = max(depth + 1, dep)
         R = r + POMDPs.discount(pomcp.problem) * reward
-        # R = r + POMDPs.discount(pomcp.problem)*simulate(pomcp, POWTreeObsNode(tree, hao), sp, d-1)
+        # R = r + POMDPs.discount(pomcp.problem)*simulate(pomcp, POWRAVETreeObsNode(tree, hao), sp, d-1)
     end
 
     tree.n[best_node] += 1

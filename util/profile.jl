@@ -1,14 +1,14 @@
 using POMDPs
-using POMCPOW
+using POMCPOWRAVE
 using ProfileView
 using POMDPModels
 
 #=
 using Gallium
-breakpoint(Pkg.dir("POMCPOW", "src", "solver.jl"), 40)
+breakpoint(Pkg.dir("POMCPOWRAVE", "src", "solver.jl"), 40)
 =#
 
-solver = POMCPOWSolver(tree_queries=50_000,
+solver = POMCPOWRAVESolver(tree_queries=50_000,
                      eps=0.01,
                      c=10.0,
                      enable_action_pw=false,

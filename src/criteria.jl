@@ -2,7 +2,7 @@ struct MaxUCB
     c::Float64
 end
 
-function select_best(crit::MaxUCB, h_node::POWTreeObsNode, rng)
+function select_best(crit::MaxUCB, h_node::POWRAVETreeObsNode, rng)
     tree = h_node.tree
     h = h_node.node
     best_criterion_val = -Inf
@@ -41,7 +41,7 @@ end
 
 struct MaxQ end
 
-function select_best(crit::MaxQ, h_node::POWTreeObsNode, rng)
+function select_best(crit::MaxQ, h_node::POWRAVETreeObsNode, rng)
     tree = h_node.tree
     h = h_node.node
     best_node = first(tree.tried[h])
@@ -58,7 +58,7 @@ end
 
 struct MaxTries end
 
-function select_best(crit::MaxTries, h_node::POWTreeObsNode, rng)
+function select_best(crit::MaxTries, h_node::POWRAVETreeObsNode, rng)
     tree = h_node.tree
     h = h_node.node
     best_node = first(tree.tried[h])

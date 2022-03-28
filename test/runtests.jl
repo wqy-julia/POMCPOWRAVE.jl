@@ -1,4 +1,4 @@
-using POMCPOW
+using POMCPOWRAVE
 using Test
 
 using POMDPs
@@ -28,9 +28,9 @@ using POMDPPolicies
         solver = POMCPOWRAVESolver()
         planner = solve(solver, pomdp)
         b = initialstate_distribution(pomdp)
-        B = POMCPOW.belief_type(POMCPOW.POWNodeFilter, typeof(pomdp))
-        tree = POMCPOWTree{B,Bool,Bool,typeof(b)}(b, 2*planner.solver.tree_queries)
-        @inferred POMCPOW.simulate(planner, POMCPOW.POWTreeObsNode(tree, 1), true, 10)
+        B = POMCPOWRAVE.belief_type(POMCPOWRAVE.POWRAVENodeFilter, typeof(pomdp))
+        tree = POMCPOWRAVETree{B,Bool,Bool,typeof(b)}(b, 2*planner.solver.tree_queries)
+        @inferred POMCPOWRAVE.simulate(planner, POMCPOWRAVE.POWRAVETreeObsNode(tree, 1), true, 10)
 
         pomdp = LightDark1D()
         solver = POMCPOWRAVESolver(default_action=485)
@@ -48,16 +48,16 @@ using POMDPPolicies
         solver = POMCPOWRAVESolver()
         planner = solve(solver, pomdp)
         b = initialstate_distribution(pomdp)
-        B = POMCPOW.belief_type(POMCPOW.POWNodeFilter, typeof(pomdp))
-        tree = POMCPOWTree{B,Bool,Bool,typeof(b)}(b, 2*planner.solver.tree_queries)
+        B = POMCPOWRAVE.belief_type(POMCPOWRAVE.POWRAVENodeFilter, typeof(pomdp))
+        tree = POMCPOWRAVETree{B,Bool,Bool,typeof(b)}(b, 2*planner.solver.tree_queries)
 
-        n = POMCPOW.POWTreeObsNode(tree, 1)
+        n = POMCPOWRAVE.POWRAVETreeObsNode(tree, 1)
         nb = belief(n)
         # we can't call current obs on the root node
         @test_throws MethodError currentobs(nb)
         # simulate the tree to expand one step
-        POMCPOW.simulate(planner, n, true, 1)
-        n = POMCPOW.POWTreeObsNode(tree, 2)
+        POMCPOWRAVE.simulate(planner, n, true, 1)
+        n = POMCPOWRAVE.POWRAVETreeObsNode(tree, 2)
         nb = belief(n)
         # but at a non-root node, this should work
         @test currentobs(nb) isa Bool
