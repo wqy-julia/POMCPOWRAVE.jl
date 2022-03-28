@@ -1,5 +1,6 @@
 struct MaxUCB
     c::Float64
+    b::Float64
 end
 
 function select_best(crit::MaxUCB, h_node::POWRAVETreeObsNode, rng)
@@ -12,12 +13,18 @@ function select_best(crit::MaxUCB, h_node::POWRAVETreeObsNode, rng)
     ltn = log(tree.total_n[h])
     for node in tree.tried[h]
         n = tree.n[node]
+        n_hat = tree.n_hat[node]
+        if n + n_hat + 4 * n * n_hat * crit.b * crit.b == 0
+            β = 0
+        else
+            β = n_hat / (n + n_hat + 4 * n * n_hat * crit.b * crit.b)
+        end
         if n == 0 && ltn <= 0.0
-            criterion_value = 0.5 * (tree.v[node] + tree.v_hat[node])
-        elseif n == 0 && 0.5 * (tree.v[node] + tree.v_hat[node]) == -Inf
+            criterion_value = (1 - β) * tree.v[node] + β * tree.v_hat[node]
+        elseif n == 0 && (1 - β) * tree.v[node] + β * tree.v_hat[node] == -Inf
             criterion_value = Inf
         else
-            criterion_value = 0.5 * (tree.v[node] + tree.v_hat[node]) + crit.c*sqrt(ltn/n)
+            criterion_value = ((1 - β) * tree.v[node] + β * tree.v_hat[node]) + crit.c*sqrt(ltn/n)
         end
         if criterion_value > best_criterion_val
             best_criterion_val = criterion_value
@@ -39,7 +46,9 @@ function select_best(crit::MaxUCB, h_node::POWRAVETreeObsNode, rng)
     end
 end
 
-struct MaxQ end
+struct MaxQ 
+    b::Float64
+end
 
 function select_best(crit::MaxQ, h_node::POWRAVETreeObsNode, rng)
     tree = h_node.tree
@@ -48,8 +57,15 @@ function select_best(crit::MaxQ, h_node::POWRAVETreeObsNode, rng)
     best_v = tree.v[best_node]
     @assert !isnan(best_v)
     for node in tree.tried[h][2:end]
-        if 0.5 * (tree.v[node] + tree.v_hat[node]) >= best_v
-            best_v = 0.5 * (tree.v[node] + tree.v_hat[node])
+        n = tree.n[node]
+        n_hat = tree.n_hat[node]
+        if n + n_hat + 4 * n * n_hat * crit.b * crit.b == 0
+            β = 0
+        else
+            β = n_hat / (n + n_hat + 4 * n * n_hat * crit.b * crit.b)
+        end
+        if (1 - β) * tree.v[node] + β * tree.v_hat[node] >= best_v
+            best_v = (1 - β) * tree.v[node] + β * tree.v_hat[node]
             best_node = node
         end
     end

@@ -135,8 +135,8 @@ Fields:
 @with_kw mutable struct POMCPOWRAVESolver{RNG<:AbstractRNG} <: AbstractPOMCPSolver
     eps::Float64                = 0.01
     max_depth::Int              = typemax(Int)
-    criterion                   = MaxUCB(1.0)
-    final_criterion             = MaxQ()
+    criterion                   = MaxUCB(1.0, 1.0)
+    final_criterion             = MaxQ(1.0)
     tree_queries::Int           = 1000
     max_time::Float64           = Inf
     rng::RNG                    = Random.GLOBAL_RNG
